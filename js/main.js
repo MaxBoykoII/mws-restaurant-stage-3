@@ -184,6 +184,34 @@ function createRestaurantHTML(restaurant) {
   address.innerHTML = restaurant.address;
   li.append(address);
 
+  const favorite = document.createElement('div');
+  favorite.className += 'restaurant-favorite';
+  favorite.tabIndex = 0;
+  li.append(favorite);
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.id = `favorite-checkbox-${restaurant.id}`;
+  favorite.onclick = () => checkbox.click();
+  favorite.append(checkbox);
+
+  const starBorder = document.createElement('i');
+  starBorder.className += 'material-icons star-border';
+  starBorder.innerText = 'star_border';
+  starBorder.onclick = () => checkbox.click();
+  favorite.append(starBorder);
+
+  const star = document.createElement('i');
+  star.className += 'material-icons star';
+  star.innerText = 'star';
+  favorite.append(star);
+
+  const label = document.createElement('label');
+  label.htmlFor = checkbox.id;
+  label.innerText = 'Favorite restaurant';
+  label.onclick = () => checkbox.click();
+  favorite.append(label);
+
   const more = document.createElement('a');
   more.tabIndex = 0;
   more.innerHTML = 'View Details';

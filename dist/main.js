@@ -277,6 +277,34 @@ function createRestaurantHTML(restaurant) {
   address.innerHTML = restaurant.address;
   li.append(address);
 
+  const favorite = document.createElement('div');
+  favorite.className += 'restaurant-favorite';
+  favorite.tabIndex = 0;
+  li.append(favorite);
+
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.id = `favorite-checkbox-${restaurant.id}`;
+  favorite.onclick = () => checkbox.click();
+  favorite.append(checkbox);
+
+  const starBorder = document.createElement('i');
+  starBorder.className += 'material-icons star-border';
+  starBorder.innerText = 'star_border';
+  starBorder.onclick = () => checkbox.click();
+  favorite.append(starBorder);
+
+  const star = document.createElement('i');
+  star.className += 'material-icons star';
+  star.innerText = 'star';
+  favorite.append(star);
+
+  const label = document.createElement('label');
+  label.htmlFor = checkbox.id;
+  label.innerText = 'Favorite restaurant';
+  label.onclick = () => checkbox.click();
+  favorite.append(label);
+
   const more = document.createElement('a');
   more.tabIndex = 0;
   more.innerHTML = 'View Details';
@@ -322,7 +350,7 @@ window.updateRestaurants = updateRestaurants;
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DBHelper", function() { return DBHelper; });
-/* harmony import */ var idb__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
+/* harmony import */ var idb__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 
 
 /**
@@ -553,15 +581,14 @@ class DBHelper {
 
 
 /***/ }),
-/* 2 */,
-/* 3 */
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "openDB", function() { return openDB; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deleteDB", function() { return deleteDB; });
-/* harmony import */ var _chunk_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _chunk_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "unwrap", function() { return _chunk_js__WEBPACK_IMPORTED_MODULE_0__["e"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "wrap", function() { return _chunk_js__WEBPACK_IMPORTED_MODULE_0__["a"]; });
@@ -646,7 +673,7 @@ Object(_chunk_js__WEBPACK_IMPORTED_MODULE_0__["b"])(oldTraps => ({
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

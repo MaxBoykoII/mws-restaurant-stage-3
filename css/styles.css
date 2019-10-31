@@ -207,6 +207,38 @@ nav h1 a {
   text-transform: uppercase;
 }
 
+.restaurant-favorite {
+  display: inline-flex;
+  align-items: flex-end;
+  position: relative;
+  cursor: pointer;
+}
+
+.restaurant-favorite input[type="checkbox"] {
+  opacity: 0;
+}
+
+.restaurant-favorite i {
+  position: absolute;
+  left: 0;
+}
+
+.restaurant-favorite label {
+  padding-left: 24px;
+}
+
+.restaurant-favorite .star {
+  opacity: 0;
+}
+
+.restaurant-favorite input[type="checkbox"]:checked ~ .star {
+  opacity: 1;
+}
+
+.checkbox input[type="checkbox"]:focus ~ .star {
+  outline: rgb(59, 153, 252) auto 5px;
+}
+
 /* ====================== Restaurant Details ====================== */
 .inside header {
   position: fixed;
