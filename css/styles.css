@@ -212,6 +212,7 @@ nav h1 a {
   align-items: flex-end;
   position: relative;
   cursor: pointer;
+  padding-left: 3px;
 }
 
 .restaurant-favorite input[type="checkbox"] {
@@ -221,10 +222,6 @@ nav h1 a {
 .restaurant-favorite i {
   position: absolute;
   left: 0;
-}
-
-.restaurant-favorite label {
-  padding-left: 24px;
 }
 
 .restaurant-favorite .star {
