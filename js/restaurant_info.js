@@ -1,4 +1,5 @@
 import { DBHelper } from './dbhelper';
+import * as moment from 'moment';
 
 let restaurant;
 var newMap;
@@ -161,7 +162,7 @@ function createReviewHTML(review) {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = moment(review.createdAt).format('LL');
   li.appendChild(date);
 
   const rating = document.createElement('p');

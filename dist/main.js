@@ -391,18 +391,29 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static async fetchRestaurants(callback) {
-    const url = `${DBHelper.DATABASE_URL}/restaurants`;
+    const restaurants_url = `${DBHelper.DATABASE_URL}/restaurants`;
+    const reviews_url = `${DBHelper.DATABASE_URL}/reviews`;
 
-    const response = await fetch(url).catch(_ => null);
+    const responses = await Promise.all([fetch(restaurants_url), fetch(reviews_url)]).catch(_ => null);
 
-    if (!response || response.status !== 200) {
+    if (!responses || responses.some(res => res.status !== 200)) {
       console.log('Request for restaurant data failed...using idb cache instead...');
       const cache = await DBHelper.loadCachedRestaurants();
       callback(null, cache);
 
       return;
     }
-    const restaurants = await response.json();
+    const restaurants = await responses[0].json();
+    const reviews = await responses[1].json();
+
+    reviews.forEach(({ restaurant_id, ...review }) => {
+      const restaurant = restaurants.find(restaurant => restaurant.id === restaurant_id);
+
+      if (!restaurant.reviews)
+        restaurant.reviews = [];
+
+      restaurant.reviews.push(review);
+    });
 
     await DBHelper.updateIdb(restaurants);
 
