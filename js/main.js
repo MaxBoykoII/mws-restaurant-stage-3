@@ -188,6 +188,7 @@ function createRestaurantHTML(restaurant) {
   favorite.className += 'restaurant-favorite';
   favorite.tabIndex = 0;
   li.append(favorite);
+  favorite.onclick = toggleFavorite(restaurant);
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
@@ -195,6 +196,8 @@ function createRestaurantHTML(restaurant) {
   favorite.tabIndex = -1;
   favorite.htmlFor = checkbox.id;
   favorite.append(checkbox);
+
+  DBHelper.parseFavorite(restaurant) && checkbox.setAttribute('checked', 'true');
 
   const starBorder = document.createElement('i');
   starBorder.className += 'material-icons star-border';
@@ -231,6 +234,19 @@ function addMarkersToMap(restaurants = self.restaurants) {
     self.markers.push(marker);
   });
 
+}
+
+function toggleFavorite(restaurant) {
+  return async () => {
+    restaurant.is_favorite = !DBHelper.parseFavorite(restaurant);
+    
+    try {
+      await DBHelper.toggleIsFavorite(restaurant);
+    }
+    catch (error) {
+      console.log('unable to toggle restaurant', restaurant, error);
+    }
+  };
 }
 
 function registerServiceWorker() {

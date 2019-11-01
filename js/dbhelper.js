@@ -223,5 +223,33 @@ export class DBHelper {
     return marker;
   } */
 
+  static async toggleIsFavorite(restaurant) {
+    try {
+      const isFavorite = DBHelper.parseFavorite(restaurant);
+
+      await fetch(`${DBHelper.DATABASE_URL}/restaurants/${restaurant.id}/?is_favorite=${isFavorite}`, {
+        method: 'PUT'
+      });
+    }
+    catch (error) {
+      console.log('unable to update restaurant...', restaurant, error);
+    }
+  }
+
+  static parseFavorite(restaurant) {
+    switch (restaurant.is_favorite) {
+      case true:
+        return true;
+      case false:
+        return false;
+      case 'true':
+        return true;
+      case 'false':
+        return false;
+    }
+
+    return false;
+  }
+
 }
 

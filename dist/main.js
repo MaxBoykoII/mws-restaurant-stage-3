@@ -281,6 +281,7 @@ function createRestaurantHTML(restaurant) {
   favorite.className += 'restaurant-favorite';
   favorite.tabIndex = 0;
   li.append(favorite);
+  favorite.onclick = toggleFavorite(restaurant);
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
@@ -288,6 +289,8 @@ function createRestaurantHTML(restaurant) {
   favorite.tabIndex = -1;
   favorite.htmlFor = checkbox.id;
   favorite.append(checkbox);
+
+  _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].parseFavorite(restaurant) && checkbox.setAttribute('checked', 'true');
 
   const starBorder = document.createElement('i');
   starBorder.className += 'material-icons star-border';
@@ -324,6 +327,19 @@ function addMarkersToMap(restaurants = self.restaurants) {
     self.markers.push(marker);
   });
 
+}
+
+function toggleFavorite(restaurant) {
+  return async () => {
+    restaurant.is_favorite = !_dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].parseFavorite(restaurant);
+    
+    try {
+      await _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].toggleIsFavorite(restaurant);
+    }
+    catch (error) {
+      console.log('unable to toggle restaurant', restaurant, error);
+    }
+  };
 }
 
 function registerServiceWorker() {
@@ -571,6 +587,34 @@ class DBHelper {
     );
     return marker;
   } */
+
+  static async toggleIsFavorite(restaurant) {
+    try {
+      const isFavorite = DBHelper.parseFavorite(restaurant);
+
+      await fetch(`${DBHelper.DATABASE_URL}/restaurants/${restaurant.id}/?is_favorite=${isFavorite}`, {
+        method: 'PUT'
+      });
+    }
+    catch (error) {
+      console.log('unable to update restaurant...', restaurant, error);
+    }
+  }
+
+  static parseFavorite(restaurant) {
+    switch (restaurant.is_favorite) {
+      case true:
+        return true;
+      case false:
+        return false;
+      case 'true':
+        return true;
+      case 'false':
+        return false;
+    }
+
+    return false;
+  }
 
 }
 
