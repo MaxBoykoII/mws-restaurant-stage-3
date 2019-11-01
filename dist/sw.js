@@ -81,284 +81,11 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
-/* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _dbhelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
-/* harmony import */ var debounce__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4);
-/* harmony import */ var debounce__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debounce__WEBPACK_IMPORTED_MODULE_1__);
-
-
-
-let restaurants,
-  neighborhoods,
-  cuisines
-var newMap
-var markers = []
-
-/**
- * Fetch neighborhoods and cuisines as soon as the page is loaded.
- */
-document.addEventListener('DOMContentLoaded', (event) => {
-  initMap(); // added 
-  fetchNeighborhoods();
-  fetchCuisines();
-  registerServiceWorker();
-});
-
-/**
- * Fetch all neighborhoods and set their HTML.
- */
-function fetchNeighborhoods() {
-  _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].fetchNeighborhoods((error, neighborhoods) => {
-    if (error) { // Got an error
-      console.error(error);
-    } else {
-      console.log('here are the neighborhoods...');
-      self.neighborhoods = neighborhoods;
-      fillNeighborhoodsHTML();
-    }
-  });
-}
-
-/**
- * Set neighborhoods HTML.
- */
-function fillNeighborhoodsHTML(neighborhoods = self.neighborhoods) {
-  const select = document.getElementById('neighborhoods-select');
-  neighborhoods.forEach(neighborhood => {
-    const option = document.createElement('option');
-    option.innerHTML = neighborhood;
-    option.value = neighborhood;
-    select.append(option);
-  });
-}
-
-/**
- * Fetch all cuisines and set their HTML.
- */
-function fetchCuisines() {
-  _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].fetchCuisines((error, cuisines) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      self.cuisines = cuisines;
-      fillCuisinesHTML();
-    }
-  });
-}
-
-/**
- * Set cuisines HTML.
- */
-function fillCuisinesHTML(cuisines = self.cuisines) {
-  const select = document.getElementById('cuisines-select');
-
-  cuisines.forEach(cuisine => {
-    const option = document.createElement('option');
-    option.innerHTML = cuisine;
-    option.value = cuisine;
-    select.append(option);
-  });
-}
-
-/**
- * Initialize leaflet map, called from HTML.
- */
-function initMap() {
-  self.newMap = L.map('map', {
-    center: [40.722216, -73.987501],
-    zoom: 12,
-    scrollWheelZoom: false
-  });
-  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-    mapboxToken: 'pk.eyJ1IjoibWJpaSIsImEiOiJjazFwZWh5Y24wdmdyM2xxZnV2Zmd4NGd3In0.oFRXL47tyj1g-O7F5bXvNQ',
-    maxZoom: 18,
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-      '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-      'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    id: 'mapbox.streets'
-  }).addTo(self.newMap);
-
-  updateRestaurants();
-}
-/* window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: loc,
-    scrollwheel: false
-  });
-  updateRestaurants();
-} */
-
-/**
- * Update page and map for current restaurants.
- */
-function updateRestaurants() {
-  const cSelect = document.getElementById('cuisines-select');
-  const nSelect = document.getElementById('neighborhoods-select');
-
-  const cIndex = cSelect.selectedIndex;
-  const nIndex = nSelect.selectedIndex;
-
-  const cuisine = cSelect[cIndex].value;
-  const neighborhood = nSelect[nIndex].value;
-
-  _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      resetRestaurants(restaurants);
-      fillRestaurantsHTML();
-    }
-  })
-}
-
-/**
- * Clear current restaurants, their HTML and remove their map markers.
- */
-function resetRestaurants(restaurants) {
-  // Remove all restaurants
-  self.restaurants = [];
-  const ul = document.getElementById('restaurants-list');
-  ul.innerHTML = '';
-
-  // Remove all map markers
-  if (self.markers) {
-    self.markers.forEach(marker => marker.remove());
-  }
-  self.markers = [];
-  self.restaurants = restaurants;
-}
-
-/**
- * Create all restaurants HTML and add them to the webpage.
- */
-function fillRestaurantsHTML(restaurants = self.restaurants) {
-  const ul = document.getElementById('restaurants-list');
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
-  });
-  addMarkersToMap();
-}
-
-/**
- * Create restaurant HTML.
- */
-function createRestaurantHTML(restaurant) {
-  const li = document.createElement('li');
-
-  const image = document.createElement('img');
-  image.className = 'restaurant-img';
-  image.alt = restaurant.name;
-  image.src = _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].imageUrlForRestaurant(restaurant);
-  image.tabIndex = 0;
-  li.append(image);
-
-  const name = document.createElement('h1');
-  name.tabIndex = 0;
-  name.innerHTML = restaurant.name;
-  li.append(name);
-
-  const neighborhood = document.createElement('p');
-  neighborhood.tabIndex = 0
-  neighborhood.innerHTML = restaurant.neighborhood;
-  li.append(neighborhood);
-
-  const address = document.createElement('p');
-  address.tabIndex = 0;
-  address.innerHTML = restaurant.address;
-  li.append(address);
-
-  const favorite = document.createElement('label');
-  favorite.className += 'restaurant-favorite';
-  favorite.tabIndex = 0;
-  li.append(favorite);
-  favorite.onclick = Object(debounce__WEBPACK_IMPORTED_MODULE_1__["debounce"])(toggleFavorite(restaurant), 250);
-
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.id = `favorite-checkbox-${restaurant.id}`;
-  favorite.tabIndex = -1;
-  favorite.htmlFor = checkbox.id;
-  favorite.append(checkbox);
-
-  _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].parseFavorite(restaurant) && checkbox.setAttribute('checked', 'true');
-
-  const starBorder = document.createElement('i');
-  starBorder.className += 'material-icons star-border';
-  starBorder.innerText = 'star_border';
-  favorite.onfocus = () => checkbox.focus();
-  favorite.append(starBorder);
-
-  const star = document.createElement('i');
-  star.className += 'material-icons star';
-  star.innerText = 'star';
-  favorite.append(star);
-  favorite.innerHTML += 'Favorite restaurant';
-
-  const more = document.createElement('a');
-  more.tabIndex = 0;
-  more.innerHTML = 'View Details';
-  more.href = _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].urlForRestaurant(restaurant);
-  li.append(more)
-
-  return li
-}
-
-/**
- * Add markers for current restaurants to the map.
- */
-function addMarkersToMap(restaurants = self.restaurants) {
-  restaurants.forEach(restaurant => {
-    // Add marker to the map
-    const marker = _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].mapMarkerForRestaurant(restaurant, self.newMap);
-    marker.on('click', onClick);
-    function onClick() {
-      window.location.href = marker.options.url;
-    }
-    self.markers.push(marker);
-  });
-
-}
-
-function toggleFavorite(restaurant) {
-  return async () => {
-    restaurant.is_favorite = !_dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].parseFavorite(restaurant);
-
-    try {
-      await _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].toggleIsFavorite(restaurant);
-    }
-    catch (error) {
-      console.log('unable to toggle restaurant', restaurant, error);
-    }
-  };
-}
-
-function registerServiceWorker() {
-  if (navigator.serviceWorker) {
-    navigator.serviceWorker.register('/sw-prod.js')
-      .then(() => console.log('Success - service worker has been registered!'))
-      .catch(e => console.log('Unable to register service worker: ', e));
-  }
-}
-
-
-window.updateRestaurants = updateRestaurants;
-
-
-
-/***/ }),
+/* 0 */,
 /* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -488,7 +215,7 @@ class DBHelper {
     const tx = db.transaction('reviews', 'readwrite');
     const store = tx.objectStore('reviews');
 
-    store.delete(review.createdAt);
+    store.remove(review.createdAt);
 
     await tx.complete;
   }
@@ -685,15 +412,18 @@ class DBHelper {
 
   static async uploadReview(restaurant, review) {
     try {
-      const createdAt = +Date.now();
-      restaurant.reviews.push({ ...review, createdAt });
+      console.log('here is the restaurant', restaurant);
+      restaurant.reviews.push({ ...review, createdAt: +Date.now() });
 
       await DBHelper.updateRestaurant(restaurant);
 
       if (navigator.serviceWorker && 'SyncManager' in window) {
+        console.log('awaiting the ready event...');
         const sw = await navigator.serviceWorker.ready;
+        console.log('got past the ready event!');
 
-        sw.sync.register('sync-new-reviews');
+        sw.syncManager.register('sync-new-reviews');
+        console.log('successfully registered a synch event!');
 
         await DBHelper.addPendingReview({ ...review, createdAt });
       } else {
@@ -1004,80 +734,99 @@ const unwrap = (value) => reverseTransformCache.get(value);
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports) {
+/* 4 */,
+/* 5 */,
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/**
- * Returns a function, that, as long as it continues to be invoked, will not
- * be triggered. The function will be called after it stops being called for
- * N milliseconds. If `immediate` is passed, trigger the function on the
- * leading edge, instead of the trailing. The function also has a property 'clear' 
- * that is a function which will clear the timer to prevent previously scheduled executions. 
- *
- * @source underscore.js
- * @see http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
- * @param {Function} function to wrap
- * @param {Number} timeout in ms (`100`)
- * @param {Boolean} whether to execute at the beginning (`false`)
- * @api public
- */
-function debounce(func, wait, immediate){
-  var timeout, args, context, timestamp, result;
-  if (null == wait) wait = 100;
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _js_dbhelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 
-  function later() {
-    var last = Date.now() - timestamp;
 
-    if (last < wait && last >= 0) {
-      timeout = setTimeout(later, wait - last);
-    } else {
-      timeout = null;
-      if (!immediate) {
-        result = func.apply(context, args);
-        context = args = null;
-      }
+const cacheRoot = 'restaurant-reviews';
+const cacheVersion = 'v9';
+const staticCacheName = `${cacheRoot}-${cacheVersion}`;
+
+console.log(`Using sw version ${staticCacheName}...`);
+
+self.addEventListener('install', event => {
+    console.log(`Opening cache for sw version ${staticCacheName}...`);
+    event.waitUntil(
+        caches.open(staticCacheName).then((cache) =>
+            cache.addAll([
+                '/',
+                '/manifest.json',
+                'restaurant.html',
+                'dist/main.js',
+                'dist/restaurant_info.js',
+                '/sw.js',
+                'css/styles.css',
+                'css/styles-sm.css',
+                'css/styles-xs.css',
+                'https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css',
+                'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
+                'img/1.jpg',
+                'img/2.jpg',
+                'img/3.jpg',
+                'img/4.jpg',
+                'img/5.jpg',
+                'img/6.jpg',
+                'img/7.jpg',
+                'img/8.jpg',
+                'img/9.jpg',
+                'img/10.jpg'
+            ]))
+            .catch(e => console.log('There was a problem opening the cache...', e)));
+});
+
+
+self.addEventListener('activate', event => {
+    console.log(`Activating sw version ${staticCacheName}...`);
+    event.waitUntil(
+        caches.keys().then(cacheNames =>
+            Promise.all(
+                cacheNames.filter(cacheName =>
+                    cacheName.startsWith(cacheRoot) &&
+                    cacheName !== staticCacheName)
+                    .map(cacheName => caches.delete(cacheName))
+            )
+        )
+    );
+});
+
+
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request, { ignoreSearch: true }).then(response => response || fetch(event.request)));
+});
+
+
+self.addEventListener('sync', () => {
+    console.log('[Service Worker] Background Syncing', event);
+    if (event.tag === 'sync-new-reviews') {
+        console.log('[Service Worker] Synching new posts');
+        event.waitUntil(_js_dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].getPendingReviews().then(reviews => {
+            reviews.forEach(async ({ createdAt, ...review }) => {
+                try {
+                    const res = await fetch(`${_js_dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].DATABASE_URL}/reviews/`, {
+                        method: 'POST',
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify(review)
+                    });
+
+                    if (res.ok) {
+                        _js_dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].removePendingReview({ createdAt });
+                    }
+                } catch (e) {
+                    console.log('unable upload review from service worker...', e);
+                }
+            });
+        }));
     }
-  };
-
-  var debounced = function(){
-    context = this;
-    args = arguments;
-    timestamp = Date.now();
-    var callNow = immediate && !timeout;
-    if (!timeout) timeout = setTimeout(later, wait);
-    if (callNow) {
-      result = func.apply(context, args);
-      context = args = null;
-    }
-
-    return result;
-  };
-
-  debounced.clear = function() {
-    if (timeout) {
-      clearTimeout(timeout);
-      timeout = null;
-    }
-  };
-  
-  debounced.flush = function() {
-    if (timeout) {
-      result = func.apply(context, args);
-      context = args = null;
-      
-      clearTimeout(timeout);
-      timeout = null;
-    }
-  };
-
-  return debounced;
-};
-
-// Adds compatibility for ES modules
-debounce.debounce = debounce;
-
-module.exports = debounce;
-
+});
 
 /***/ })
 /******/ ]);

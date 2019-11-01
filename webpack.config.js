@@ -2,11 +2,12 @@ const path = require('path');
 
 module.exports = {
     entry: { 
-        'main': './js/main.js',
-        'restaurant_info': './js/restaurant_info.js'
+        'dist/main': './js/main.js',
+        'dist/restaurant_info': './js/restaurant_info.js',
+        'sw-prod': './sw.js'
     },
     output: {
-        path: path.join(__dirname, 'dist'),
+        path: path.join(__dirname),
         filename: '[name].js'
     },
     mode: 'none'

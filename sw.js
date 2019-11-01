@@ -1,3 +1,5 @@
+import { DBHelper } from './js/dbhelper';
+
 const cacheRoot = 'restaurant-reviews';
 const cacheVersion = 'v9';
 const staticCacheName = `${cacheRoot}-${cacheVersion}`;
@@ -53,4 +55,31 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request, { ignoreSearch: true }).then(response => response || fetch(event.request)));
+});
+
+
+self.addEventListener('sync', event => {
+    console.log('[Service Worker] Background Syncing', event);
+    if (event.tag === 'sync-new-reviews') {
+        console.log('[Service Worker] Synching new posts');
+        event.waitUntil(DBHelper.getPendingReviews().then(reviews => {
+            reviews.forEach(async ({ createdAt, ...review }) => {
+                try {
+                    const res = await fetch(`${DBHelper.DATABASE_URL}/reviews/`, {
+                        method: 'POST',
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify(review)
+                    });
+
+                    if (res.ok) {
+                        DBHelper.removePendingReview({ createdAt });
+                    }
+                } catch (e) {
+                    console.log('unable upload review from service worker...', e);
+                }
+            });
+        }));
+    }
 });

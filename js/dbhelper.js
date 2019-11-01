@@ -18,6 +18,7 @@ export class DBHelper {
     return openDB('restaurants-db', 1, {
       upgrade: upgradeDb => {
         upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+        upgradeDb.createObjectStore('reviews', { keyPath: 'createdAt' })
       }
     })
   }
@@ -77,13 +78,49 @@ export class DBHelper {
   }
 
   static async updateRestaurant(restaurant) {
-    console.log('here is the restaurant we are updating...', restaurant);
     const db = await DBHelper.dbPromise;
 
     const tx = db.transaction('restaurants', 'readwrite');
     const store = tx.objectStore('restaurants');
 
     store.put(restaurant);
+
+    await tx.complete;
+  }
+
+  static async addPendingReview(review) {
+    const db = await DBHelper.dbPromise;
+    console.log('adding a pending review', review);
+    const tx = db.transaction('reviews', 'readwrite');
+    const store = tx.objectStore('reviews');
+
+    store.put(review);
+
+    await tx.complete;
+
+    console.log('success, pending review has been added', review);
+  }
+
+  static async getPendingReviews() {
+    const db = await DBHelper.dbPromise;
+
+    const tx = db.transaction('reviews');
+    const store = tx.objectStore('reviews');
+
+    const restaurants = await store.getAll();
+
+    await tx.complete;
+
+    return restaurants;
+  }
+
+  static async removePendingReview(review) {
+    const db = await DBHelper.dbPromise;
+
+    const tx = db.transaction('reviews', 'readwrite');
+    const store = tx.objectStore('reviews');
+
+    store.delete(review.createdAt);
 
     await tx.complete;
   }
@@ -280,18 +317,27 @@ export class DBHelper {
 
   static async uploadReview(restaurant, review) {
     try {
-      console.log('here is the restaurant', restaurant);
-      restaurant.reviews.push({ ...review, createdAt: +Date.now() });
+      const createdAt = +Date.now();
+      restaurant.reviews.push({ ...review, createdAt });
 
       await DBHelper.updateRestaurant(restaurant);
 
-      await fetch(`${DBHelper.DATABASE_URL}/reviews/`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify(review)
-      });
+      if (navigator.serviceWorker && 'SyncManager' in window) {
+        const sw = await navigator.serviceWorker.ready;
+
+        sw.sync.register('sync-new-reviews');
+
+        await DBHelper.addPendingReview({ ...review, createdAt });
+      } else {
+
+        await fetch(`${DBHelper.DATABASE_URL}/reviews/`, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify(review)
+        });
+      }
     }
 
     catch (e) {

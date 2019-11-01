@@ -252,7 +252,7 @@ function toggleFavorite(restaurant) {
 
 function registerServiceWorker() {
   if (navigator.serviceWorker) {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/sw-prod.js')
       .then(() => console.log('Success - service worker has been registered!'))
       .catch(e => console.log('Unable to register service worker: ', e));
   }
