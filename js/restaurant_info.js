@@ -1,5 +1,5 @@
 import { DBHelper } from './dbhelper';
-import * as moment from 'moment';
+//import { format } from 'date-fns';
 
 let restaurant;
 var newMap;
@@ -162,7 +162,7 @@ function createReviewHTML(review) {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = moment(review.createdAt).format('LL');
+  date.innerHTML = formatTimestamp(review.createdAt, 'dd MMMM yyyy');
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -200,4 +200,20 @@ function getParameterByName(name, url) {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function formatTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  const months = [
+    'January', 'February', 'March',
+    'April', 'May', 'June', 'July',
+    'August', 'September', 'October',
+    'November', 'December'
+  ];
+
+  const day = date.getDate();
+  const monthIndex = date.getMonth();
+  const year = date.getFullYear();
+
+  return `${day} ${months[monthIndex]} ${year}`;
 }
