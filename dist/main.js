@@ -441,6 +441,18 @@ class DBHelper {
     await tx.complete;
   }
 
+  static async updateRestaurant(restaurant) {
+    console.log('here is the restaurant we are updating...', restaurant);
+    const db = await DBHelper.dbPromise;
+
+    const tx = db.transaction('restaurants', 'readwrite');
+    const store = tx.objectStore('restaurants');
+
+    store.put(restaurant);
+
+    await tx.complete;
+  }
+
   static async loadCachedRestaurants() {
     const db = await DBHelper.dbPromise;
 
@@ -631,6 +643,11 @@ class DBHelper {
 
   static async uploadReview(restaurant, review) {
     try {
+      console.log('here is the restaurant', restaurant);
+      restaurant.reviews.push({ ...review, createdAt: +Date.now() });
+
+      await DBHelper.updateRestaurant(restaurant);
+
       await fetch(`${DBHelper.DATABASE_URL}/reviews/`, {
         method: 'POST',
         headers: {
@@ -641,6 +658,7 @@ class DBHelper {
     }
 
     catch (e) {
+      console.error(e);
       console.log('unable to add a new review for restaurant', restaurant);
     }
   }

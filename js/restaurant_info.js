@@ -229,7 +229,7 @@ function handleSubmit() {
 
     const review = { restaurant_id: self.restaurant.id, name, rating, comments };
 
-    await DBHelper.uploadReview(restaurant, review);
+    await DBHelper.uploadReview(self.restaurant, review);
 
     const reviewHtml = createReviewHTML({ ...review, createdAt: +Date.now() });
 
