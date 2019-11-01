@@ -1,5 +1,4 @@
 import { DBHelper } from './dbhelper';
-//import { format } from 'date-fns';
 
 let restaurant;
 var newMap;
@@ -9,6 +8,7 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap();
+  handleSubmit();
 });
 
 /**
@@ -216,4 +216,25 @@ function formatTimestamp(timestamp) {
   const year = date.getFullYear();
 
   return `${day} ${months[monthIndex]} ${year}`;
+}
+
+function handleSubmit() {
+  const form = document.getElementById('review-form');
+
+  form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const name = ev.target.name.value || 'Anonymous';
+    const rating = ev.target.rating.value;
+    const comments = ev.target.comments.value;
+
+    const review = { restaurant_id: self.restaurant.id, name, rating, comments };
+
+    await DBHelper.uploadReview(restaurant, review);
+
+    const reviewHtml = createReviewHTML({ ...review, createdAt: +Date.now() });
+
+    document.getElementById('reviews-list').appendChild(reviewHtml);
+
+    form.reset();
+  });
 }

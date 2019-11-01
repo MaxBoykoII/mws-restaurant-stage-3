@@ -29,17 +29,19 @@ export class DBHelper {
     const restaurants_url = `${DBHelper.DATABASE_URL}/restaurants`;
     const reviews_url = `${DBHelper.DATABASE_URL}/reviews`;
 
-    const responses = await Promise.all([fetch(restaurants_url), fetch(reviews_url)]).catch(_ => null);
+    const response = await fetch(restaurants_url).catch(_ => null);
 
-    if (!responses || responses.some(res => res.status !== 200)) {
+    if (!response || response.status !== 200) {
       console.log('Request for restaurant data failed...using idb cache instead...');
       const cache = await DBHelper.loadCachedRestaurants();
       callback(null, cache);
 
       return;
     }
-    const restaurants = await responses[0].json();
-    const reviews = await responses[1].json();
+    const restaurants = await response.json();
+
+    const reviewResponses = await Promise.all(restaurants.map(({ id }) => fetch(`${reviews_url}/?restaurant_id=${id}`)));
+    const reviews = (await Promise.all(reviewResponses.flatMap(res => res.json()))).flatMap(r => r);
 
     reviews.forEach(({ restaurant_id, ...review }) => {
       const restaurant = restaurants.find(restaurant => restaurant.id === restaurant_id);
@@ -262,5 +264,20 @@ export class DBHelper {
     return false;
   }
 
+  static async uploadReview(restaurant, review) {
+    try {
+      await fetch(`${DBHelper.DATABASE_URL}/reviews/`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(review)
+      });
+    }
+
+    catch (e) {
+      console.log('unable to add a new review for restaurant', restaurant);
+    }
+  }
 }
 
