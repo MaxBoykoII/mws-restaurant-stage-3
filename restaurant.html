@@ -16,7 +16,7 @@
     integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
     crossorigin="" />
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#317EFB"/>
+  <meta name="theme-color" content="#317EFB" />
   <link rel="apple-touch-icon" href="icons/restaurant.png">
   <title>Restaurant Info</title>
 </head>
@@ -58,6 +58,25 @@
       <ul id="reviews-list"></ul>
     </section>
     <!-- End reviews -->
+    <section id="add-review-container">
+      <h1 id="leave-review" tabindex="0">Leave a Review</h1>
+      <form>
+        <label for="name">Name</label>
+        <input id="name" type="text" placeholder="Name" required>
+        <label for="rating">Rating</label>
+        <select id="rating" required>
+          <option value="none" selected disabled hidden>Choose a rating</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <label for="comments">Comments</label>
+        <textarea id="comments" placeholder="Write your review here"></textarea>
+        <button type="submit" tabindex="0">Submit</button>
+      </form>
+    </section>
   </main>
   <!-- End main -->
 

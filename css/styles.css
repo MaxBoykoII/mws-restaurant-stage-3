@@ -194,7 +194,7 @@ nav h1 a {
   margin-bottom: auto;
 }
 
-#restaurants-list li a {
+#restaurants-list li a, #add-review-container form button {
   background-color: orange;
   border-bottom: 3px solid #eee;
   color: #fff;
@@ -261,7 +261,7 @@ nav h1 a {
   position: absolute;
   width: 50%;
 }
-#restaurant-name {
+#restaurant-name, #leave-review {
   color: #f18200;
   font-family: Arial,sans-serif;
   font-size: 2rem;
@@ -297,7 +297,7 @@ nav h1 a {
   width: 50%;
 }
 #reviews-container {
-  padding: 30px 40px 80px;
+  padding: 30px 40px 10px;
 }
 #reviews-container h2 {
   color: #f58500;
@@ -312,7 +312,7 @@ nav h1 a {
 }
 #reviews-list li {
   background-color: #fff;
-    border: 2px solid #f3f3f3;
+  border: 2px solid #f3f3f3;
   display: block;
   list-style-type: none;
   margin: 0 0 30px;
@@ -326,6 +326,21 @@ nav h1 a {
 }
 #restaurant-hours td {
   color: #666;
+}
+
+#add-review-container {
+  padding: 0 40px 90px 40px;
+  width: 50%;
+}
+
+#add-review-container form {
+  display: flex;
+  flex-direction: column;
+  width: 85%;
+}
+
+#add-review-container form label:not(:first-child), #add-review-container form button {
+  margin-top: 1em;
 }
 
 /* ====================== Utils ====================== */

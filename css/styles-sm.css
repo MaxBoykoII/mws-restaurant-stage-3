@@ -28,8 +28,12 @@
       display: none;
   }
 
-  #restaurant-container, #reviews-container {
+  #restaurant-container, #reviews-container, #add-review-container {
       width: 100%;
+  }
+
+  #add-review-container {
+      padding-bottom: 40px;
   }
 
   #restaurant-container {
