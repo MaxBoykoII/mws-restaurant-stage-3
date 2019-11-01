@@ -1,4 +1,5 @@
 import { DBHelper } from './dbhelper';
+import { debounce } from 'debounce';
 
 let restaurants,
   neighborhoods,
@@ -188,7 +189,7 @@ function createRestaurantHTML(restaurant) {
   favorite.className += 'restaurant-favorite';
   favorite.tabIndex = 0;
   li.append(favorite);
-  favorite.onclick = toggleFavorite(restaurant);
+  favorite.onclick = debounce(toggleFavorite(restaurant), 250);
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
@@ -239,7 +240,7 @@ function addMarkersToMap(restaurants = self.restaurants) {
 function toggleFavorite(restaurant) {
   return async () => {
     restaurant.is_favorite = !DBHelper.parseFavorite(restaurant);
-    
+
     try {
       await DBHelper.toggleIsFavorite(restaurant);
     }

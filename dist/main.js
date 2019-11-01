@@ -91,6 +91,9 @@
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _dbhelper__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
+/* harmony import */ var debounce__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(5);
+/* harmony import */ var debounce__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(debounce__WEBPACK_IMPORTED_MODULE_1__);
+
 
 
 let restaurants,
@@ -281,7 +284,7 @@ function createRestaurantHTML(restaurant) {
   favorite.className += 'restaurant-favorite';
   favorite.tabIndex = 0;
   li.append(favorite);
-  favorite.onclick = toggleFavorite(restaurant);
+  favorite.onclick = Object(debounce__WEBPACK_IMPORTED_MODULE_1__["debounce"])(toggleFavorite(restaurant), 250);
 
   const checkbox = document.createElement('input');
   checkbox.type = 'checkbox';
@@ -332,7 +335,7 @@ function addMarkersToMap(restaurants = self.restaurants) {
 function toggleFavorite(restaurant) {
   return async () => {
     restaurant.is_favorite = !_dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].parseFavorite(restaurant);
-    
+
     try {
       await _dbhelper__WEBPACK_IMPORTED_MODULE_0__["DBHelper"].toggleIsFavorite(restaurant);
     }
@@ -616,7 +619,7 @@ class DBHelper {
   static async toggleIsFavorite(restaurant) {
     try {
       const isFavorite = DBHelper.parseFavorite(restaurant);
-
+      
       await fetch(`${DBHelper.DATABASE_URL}/restaurants/${restaurant.id}/?is_favorite=${isFavorite}`, {
         method: 'PUT'
       });
@@ -950,6 +953,83 @@ function wrap(value) {
 const unwrap = (value) => reverseTransformCache.get(value);
 
 
+
+
+/***/ }),
+/* 4 */,
+/* 5 */
+/***/ (function(module, exports) {
+
+/**
+ * Returns a function, that, as long as it continues to be invoked, will not
+ * be triggered. The function will be called after it stops being called for
+ * N milliseconds. If `immediate` is passed, trigger the function on the
+ * leading edge, instead of the trailing. The function also has a property 'clear' 
+ * that is a function which will clear the timer to prevent previously scheduled executions. 
+ *
+ * @source underscore.js
+ * @see http://unscriptable.com/2009/03/20/debouncing-javascript-methods/
+ * @param {Function} function to wrap
+ * @param {Number} timeout in ms (`100`)
+ * @param {Boolean} whether to execute at the beginning (`false`)
+ * @api public
+ */
+function debounce(func, wait, immediate){
+  var timeout, args, context, timestamp, result;
+  if (null == wait) wait = 100;
+
+  function later() {
+    var last = Date.now() - timestamp;
+
+    if (last < wait && last >= 0) {
+      timeout = setTimeout(later, wait - last);
+    } else {
+      timeout = null;
+      if (!immediate) {
+        result = func.apply(context, args);
+        context = args = null;
+      }
+    }
+  };
+
+  var debounced = function(){
+    context = this;
+    args = arguments;
+    timestamp = Date.now();
+    var callNow = immediate && !timeout;
+    if (!timeout) timeout = setTimeout(later, wait);
+    if (callNow) {
+      result = func.apply(context, args);
+      context = args = null;
+    }
+
+    return result;
+  };
+
+  debounced.clear = function() {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+  };
+  
+  debounced.flush = function() {
+    if (timeout) {
+      result = func.apply(context, args);
+      context = args = null;
+      
+      clearTimeout(timeout);
+      timeout = null;
+    }
+  };
+
+  return debounced;
+};
+
+// Adds compatibility for ES modules
+debounce.debounce = debounce;
+
+module.exports = debounce;
 
 
 /***/ })

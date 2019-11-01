@@ -251,7 +251,7 @@ export class DBHelper {
   static async toggleIsFavorite(restaurant) {
     try {
       const isFavorite = DBHelper.parseFavorite(restaurant);
-
+      
       await fetch(`${DBHelper.DATABASE_URL}/restaurants/${restaurant.id}/?is_favorite=${isFavorite}`, {
         method: 'PUT'
       });
