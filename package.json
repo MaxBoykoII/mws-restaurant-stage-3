@@ -21,7 +21,7 @@
   "devDependencies": {
     "path": "^0.12.7",
     "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.9"
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "debounce": "^1.2.0",
